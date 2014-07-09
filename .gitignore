@@ -1,0 +1,5 @@
+.idea
+.idea_modules
+activator-launch-1.2.3.jar
+target
+*.log

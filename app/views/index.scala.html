@@ -1,0 +1,22 @@
+@(story: List[Story])
+
+@main("Story database") {
+  <h2>Insert a story here:</h2>
+
+  <form action="/insert" method="POST">
+    <input name="name" type="text" placeholder="name your feline friend"/>
+    <input name="color" type="text" placeholder="enter the color of this kitty cat"/>
+    <input type="submit"/>
+  </form>
+
+  <h2>Previously inserted cats:</h2>
+  <table>
+    <tr><th>Name</th><th>Color</th></tr>
+    @for(s <- story){
+    <tr><td>@s.title</td><td>@s.text</td></tr>
+    }
+  </table>
+
+
+    
+}
