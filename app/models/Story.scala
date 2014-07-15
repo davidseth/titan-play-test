@@ -5,7 +5,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class Story(title: String, text: String, var tags: Option[Set[Tag]], var author: Option[Author])
+case class Story(var title: String, var text: String, var tags: Option[Set[Tag]], var author: Option[Author])
 
 object Story {
 
