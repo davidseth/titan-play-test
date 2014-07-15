@@ -10,9 +10,9 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /graph                      controllers.Application.graph
 GET     /authors                    controllers.AuthorController.getAuthors
-
+GET     /authorsJson                controllers.AuthorController.getAuthorsJson
 GET     /stories                    controllers.StoryController.getStories
-GET     /story                      controllers.StoryController.getStory
 
+GET     /story/:id                  controllers.StoryController.getStory(id: Long)
 POST    /story                      controllers.StoryController.insertStory
 

@@ -21,6 +21,10 @@ object AuthorController extends Controller{
     Ok(json)
   }
 
+  def getAuthorsJson = Action {
+    Ok(Json.toJson(Author.listJson))
+  }
+
 //  def insertSto = Action(BodyParsers.parse.json) { request =>
 //    val storyResult = request.body.validate[Story]
 //    storyResult.fold(
