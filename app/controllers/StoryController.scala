@@ -1,13 +1,22 @@
 package controllers
 
+import com.thinkaurelius.titan.core.Multiplicity
+import com.thinkaurelius.titan.core.TitanFactory
+import com.thinkaurelius.titan.core.TitanGraph
+import com.thinkaurelius.titan.core.attribute.Geoshape
+import com.tinkerpop.blueprints.util.ElementHelper
+import controllers. { Application, StoryController }
 import models._
+import org.apache.commons.configuration.BaseConfiguration
 import play.api._
+
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
 import play.api.Play.current
 import play.api.mvc.BodyParsers._
 import play.api.libs.json._
+import play.api.libs.json.Json._
 
 object StoryController extends Controller{
 
@@ -21,9 +30,17 @@ object StoryController extends Controller{
     Ok(json)
   }
 
-  def getStory = Action {
+  def getStory(id: Long) = Action {
 
-//    var json = com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility.jsonFromElement(vertex, null, com.tinkerpop.blueprints.util.io.graphson.GraphSONMode.EXTENDED);
+    val g: TitanGraph = IcebergGraph.getTitanConnection
+    val vertex = g.getVertex(id);
+
+    val story = Story(vertex.getProperty("title"), vertex.getProperty("body"), None, None)
+    Ok(Json.toJson(story))
+    //vertex.addPropert("name", "david")
+    //var json = com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility.jsonFromElement(vertex, null, com.tinkerpop.blueprints.util.io.graphson.GraphSONMode.EXTENDED);
+
+    //json
 //
 //    val result = com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility.jsonFromElement(vertex, null, com.tinkerpop.blueprints.util.io.graphson.GraphSONMode.NORMAL);
 

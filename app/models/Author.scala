@@ -83,7 +83,7 @@ object Author {
       //println( "graphitem: " + graphItem.out("friends").tree )
       //println(graphItem.toString())
 
-      val friends: List[JsValue] = for(friend <- graphItem.out("friends").has("name").toList) yield {
+      val friends: List[JsValue] = for(friend <- graphItem.out("friends").toList) yield {
         Json.obj(
           "name" -> JsString(graphItem.getProperty("name")),
           "values" -> JsString(graphItem.getPropertyKeys.toString)

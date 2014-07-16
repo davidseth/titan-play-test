@@ -7,7 +7,7 @@ import play.api.libs.functional.syntax._
 /**
  * Created by david on 7/07/2014.
  */
-case class Tag (name: String)
+case class Tag (var name: String)
 
 object Tag {
 

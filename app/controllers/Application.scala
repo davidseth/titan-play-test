@@ -18,14 +18,7 @@ import play.api.mvc.BodyParsers._
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
 
-object Application extends Controller{
-
-  object VertexTypes {
-    val Person = "human"
-    val Media = "media"
-    val Story = "story"
-  }
-
+object IcebergGraph {
   var g: TitanGraph = null
 
   def getTitanConf = {
@@ -50,9 +43,19 @@ object Application extends Controller{
     }
     g
   }
+}
+
+object Application extends Controller {
+
+  object VertexTypes {
+    val Person = "human"
+    val Media = "media"
+    val Story = "story"
+  }
+
 
   def titanManagement = {
-    var g = getTitanConnection
+    var g = IcebergGraph.getTitanConnection
     var mgmt = g.getManagementSystem();
 
 
@@ -91,7 +94,7 @@ object Application extends Controller{
   }
 
   def graph = Action {
-    val g = getTitanConnection
+    val g = IcebergGraph.getTitanConnection
 
     val juno = g.addVertex("person")
     juno.setProperty("class", "person")
