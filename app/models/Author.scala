@@ -76,28 +76,38 @@ object Author {
     //val row = gremlinPipeline.next
 
 
-
     val jsonFriends = new ListBuffer[JsValue]()
 
     val authors = for(graphItem <- authorsGraph) yield {
       //println( "graphitem: " + graphItem.out("friends").tree )
       //println(graphItem.toString())
 
-      val friends: List[JsValue] = for(friend <- graphItem.out("friends").toList) yield {
+      val authorFriends = for(friend <- graphItem.out("friends").toList) yield {
         Json.obj(
-          "name" -> JsString(graphItem.getProperty("name")),
-          "values" -> JsString(graphItem.getPropertyKeys.toString)
+          "name" -> JsString(friend.getProperty("name")),
+          "values" -> JsString(friend.getPropertyKeys.toString)
         )
       }
 
-      jsonFriends += Json.obj(
+      var friendAsJson = Json.obj(
         "name" -> JsString(graphItem.getProperty("name")),
-        "values" -> JsString(graphItem.getPropertyKeys.toString),
-        "friends" -> friends
+        "values" -> JsString(graphItem.getPropertyKeys.toString)
       )
 
+      //val jsonObject = Json.toJson(friendAsJson)
 
-      Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString, None)
+
+      //if (!authorFriends.isEmpty) {
+      //jsonObject.as[JsObject] + ("friendsXX" -> Json.toJson("friends"))
+      friendAsJson += ("friends" -> Json.toJson(authorFriends))
+      //}
+
+      friendAsJson += ("friendsXX" -> Json.toJson("friends"))
+
+      jsonFriends += friendAsJson
+
+
+      //Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString, None)
     }
     jsonFriends
   }
