@@ -18,8 +18,6 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 
-
-
 import com.tinkerpop.blueprints. {Vertex, Edge }
 import com.tinkerpop.blueprints.util.ElementHelper
 
@@ -28,9 +26,29 @@ case class Author(var name: String, var email: String, var likes: Option[List[Au
 
 object Author {
 
-  var list2: List[Author] = {
+  def get(id: Long): Author  = {
+    val g = IcebergGraph.getTitanConnection
+    val authorVertex = g.v(id)
 
-    var g = IcebergGraph.getTitanConnection
+    val author = Author(authorVertex.getProperty("name"), authorVertex.getProperty("email"))
+
+    author
+  }
+
+  def get(vertex: Vertex): JsObject = {
+    val authorJson = Json.obj(
+      "name" -> JsString(vertex.getProperty("name")),
+      "email" -> JsString(vertex.getProperty("email")),
+      "values" -> JsString(vertex.getPropertyKeys.toString),
+      "id" -> vertex.getProperty("id").toString
+    )
+
+    authorJson
+  }
+
+  def list2: List[Author] = {
+
+    val g = IcebergGraph.getTitanConnection
     val authorsGraph = g.V.has("name").toList()
     val authors = for(graphItem <- authorsGraph) yield {
       println( "graphitem: " + graphItem.out("friends").tree )
@@ -41,7 +59,7 @@ object Author {
   }
 
 
-  var list: List[Author] = {
+  def list: List[Author] = {
 
     var g = IcebergGraph.getTitanConnection
     val authorsGraph = g.V.has("name").toList()
@@ -67,7 +85,7 @@ object Author {
     authors
   }
 
-  var listJson: ListBuffer[JsValue] = {
+  def listJson: ListBuffer[JsValue] = {
 
     var g = IcebergGraph.getTitanConnection
     val authorsGraph = g.V.has("name").toList()
@@ -78,41 +96,23 @@ object Author {
 
     val jsonFriends = new ListBuffer[JsValue]()
 
-    val authors = for(graphItem <- authorsGraph) yield {
-      //println( "graphitem: " + graphItem.out("friends").tree )
-      //println(graphItem.toString())
+    for(graphItem <- authorsGraph) {
+      var friendAsJson = get(graphItem)
 
       val authorFriends = for(friend <- graphItem.out("friends").toList) yield {
-        Json.obj(
-          "name" -> JsString(friend.getProperty("name")),
-          "values" -> JsString(friend.getPropertyKeys.toString)
-        )
+        get (friend)
       }
 
-      var friendAsJson = Json.obj(
-        "name" -> JsString(graphItem.getProperty("name")),
-        "values" -> JsString(graphItem.getPropertyKeys.toString)
-      )
-
-      //val jsonObject = Json.toJson(friendAsJson)
-
-
-      //if (!authorFriends.isEmpty) {
-      //jsonObject.as[JsObject] + ("friendsXX" -> Json.toJson("friends"))
-      friendAsJson += ("friends" -> Json.toJson(authorFriends))
-      //}
-
-      friendAsJson += ("friendsXX" -> Json.toJson("friends"))
+      if (!authorFriends.isEmpty) {
+        friendAsJson += ("friends" -> Json.toJson(authorFriends))
+      }
 
       jsonFriends += friendAsJson
-
-
-      //Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString, None)
     }
     jsonFriends
   }
 
-  var listWorks: List[Author] = {
+  def listWorks: List[Author] = {
 
     var g = IcebergGraph.getTitanConnection
     val authorsGraph = g.V.has("name").toList()
@@ -159,16 +159,29 @@ object Author {
 
     authors
   }
+
+  val fromCreated = __.json.update((__ \ 'created).json.copyFrom( (__ \ 'created \ '$date).json.pick ))
+
+  /** prunes _id
+    * and then prunes pw
+    */
+  val outputPerson =
+    fromCreated andThen
+    (__ \ 'name).json.prune andThen
+      (__ \ 'email).json.prune
+
+
+
     
-    implicit val authorReads: Reads[Author] = (
-      (JsPath \ "name").read[String] and
-      (JsPath \ "email").read[String] and
-      (JsPath \ "likes").readNullable[List[Author]]
-    )(Author.apply _)
-    
-    implicit val authorWrites: Writes[Author] = (
-      (JsPath \ "name").write[String] and
-      (JsPath \ "email").write[String] and
-        (JsPath \ "likes").writeNullable[List[Author]]
-    )(unlift(Author.unapply))
+  implicit val authorReads: Reads[Author] = (
+    (JsPath \ "name").read[String] and
+    (JsPath \ "email").read[String] and
+    (JsPath \ "likes").readNullable[List[Author]]
+  )(Author.apply _)
+
+  implicit val authorWrites: Writes[Author] = (
+    (JsPath \ "name").write[String] and
+    (JsPath \ "email").write[String] and
+      (JsPath \ "likes").writeNullable[List[Author]]
+  )(unlift(Author.unapply))
 }
