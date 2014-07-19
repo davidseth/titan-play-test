@@ -9,8 +9,12 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /graph                      controllers.Application.graph
+
+GET     /author/:id                 controllers.AuthorController.getAuthor(id: Long)
 GET     /authors                    controllers.AuthorController.getAuthors
 GET     /authorsJson                controllers.AuthorController.getAuthorsJson
+
+
 GET     /stories                    controllers.StoryController.getStories
 
 GET     /story/:id                  controllers.StoryController.getStory(id: Long)

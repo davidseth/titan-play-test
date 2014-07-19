@@ -25,10 +25,10 @@ object IcebergGraph {
     val conf = new BaseConfiguration();
     conf.setProperty("storage.backend","cassandra");
     conf.setProperty("storage.hostname","127.0.0.1");
-    conf.setProperty("cache.db-cache","true");
-    conf.setProperty("cache.db-cache-clean-wait","20");
-    conf.setProperty("cache.db-cache-time","0");
-    conf.setProperty("cache.db-cache-size","0.25");
+    conf.setProperty("cache.db-cache","false");
+//    conf.setProperty("cache.db-cache-clean-wait","20");
+//    conf.setProperty("cache.db-cache-time","0");
+//    conf.setProperty("cache.db-cache-size","0.25");
 
     conf.setProperty("storage.index.search.backend", "elasticsearch");
     conf.setProperty("storage.index.search.hostname", "127.0.0.1");
