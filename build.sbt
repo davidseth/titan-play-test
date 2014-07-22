@@ -13,7 +13,7 @@ libraryDependencies ++= {
     "com.michaelpollmeier" %% "gremlin-scala" % tinkerpopV,
     "com.github.nscala-time" %% "nscala-time" % "1.2.0",
     "io.argonaut" %% "argonaut" % "6.0.4",
-  "org.reflections" % "reflections" % "0.9.8" notTransitive ()
+    "org.reflections" % "reflections" % "0.9.8" notTransitive ()
   )
 }
 

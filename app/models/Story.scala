@@ -5,7 +5,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-//import argonaut._, Argonaut._
+import argonaut._, Argonaut._
 
 case class Story(var title: String, var text: String, var tags: Option[Set[Tag]], var author: Option[Author])
 
@@ -24,10 +24,10 @@ object Story {
     list = list ::: List(story)
   }
 
-  // argonaut
-//  implicit def StoryEncodeJson: EncodeJson[Story] =
-//    EncodeJson((p: Story) =>
-//      ("title" := p.title) ->: ("text" := p.text) ->: ("tags" := Option[Set[p.tags]]) ->: ("author" := Some(p.author)) ->: jEmptyObject)
+  //argonaut
+  implicit def StoryEncodeJson: EncodeJson[Story] =
+    EncodeJson((p: Story) =>
+      ("title" := p.title) ->: ("text" := p.text) ->: ("tags" := Option[Set[p.tags]]) ->: ("author" := Some(p.author)) ->: jEmptyObject)
 
 //  def save2(story: Story): Try[List[String]] = {
 //    Try(io.Source.fromFile(filename).getLines.toList)
@@ -42,27 +42,20 @@ object Story {
 
 //  implicit val storyReads = Json.reads[Story]
 
-  implicit val storyReads: Reads[Story] = (
-    (JsPath \ "title").read[String](minLength[String](2)) and
-    (JsPath \ "text").read[String](minLength[String](4)) and
-    (JsPath \ "tags").readNullable[Set[Tag]] and
-    (JsPath \ "author").readNullable[Author]
-  )(Story.apply _)
+  implicit val storyReads = (
+    (__ \ 'title).read[String] and
+    (__ \ 'text).read[String] and
+    (__ \ 'tags).read[Option[Set[Tag]]] and
+    (__ \ 'text).read[Option[Author]]
+  )(Story)
 
 
   implicit val storyWrites = new Writes[Story] {
-    def writes(story: Story) = Json.obj(
+    def writes(story: Story) = play.api.libs.json.Json.obj(
       "title" -> story.title,
-      "email" -> story.text,
+      "text" -> story.text,
       "tags" -> story.tags,
       "author" -> story.author
     )
   }
-
-//  implicit val storyWrites: Writes[Story] = (
-//    (JsPath \ "title").write[String] and
-//    (JsPath \ "text").write[String] and
-//    (JsPath \ "tags").writeNullable[Set[Tag]] and
-//    (JsPath \ "author").writeNullable[Author]
-//  )(unlift(Story.unapply))
 }

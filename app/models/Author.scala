@@ -24,34 +24,32 @@ import com.tinkerpop.blueprints.util.ElementHelper
 import com.github.nscala_time.time.Imports._
 
 
-//class Author(var name: String, var email: String, var likes: Option[List[Author]]) {
-//  val timestamp = DateTime.now
-//}
-
-case class Author(var name: String, var email: String, var likes: Option[List[Author]] = None) {
+class Author(var name: String, var email: String, var likes: Option[List[Author]] = None) {
   val timestamp = DateTime.now
 }
 
 object Author {
 
-//  def apply() = new Author("none", "none", None)
+  def apply() = new Author("none", "none", None)
 
-//  def apply(name: String) = new Author(name, "none", None)
+  def apply(name: String) = new Author(name, "none", None)
 
-//  def apply(name: String, email: String): Author = {
-//    val a = new Author(name, email, None)
-//    a
-//  }
-//
-//  def unapply(a: Author) : Option[(String, String, Option[List[Author]])] = {
-//    println("in unapply, name = " + a.name + " zip = " + a.email);
-//    return Some((a.name, a.email, a.likes))
-//  }
-//
-//  def apply(name: String, email: String, likes: Option[List[Author]]): Author = {
-//    val a = new Author(name, email, None)
-//    a
-//  }
+  def apply(name: String, email: String): Author = {
+    val a = new Author(name, email, None)
+    a
+  }
+
+  def apply(name: String, email: String, likes: Option[List[Author]]): Author = {
+    val a = new Author(name, email, None)
+    a
+  }
+
+  def unapply(a: Author) : Option[(String, String, Option[List[Author]])] = {
+    println("in unapply, name = " + a.name + " zip = " + a.email);
+    return Some((a.name, a.email, a.likes))
+  }
+
+
 
   val json: JsValue = Json.obj(
     "name" -> "Watership Down",
@@ -167,54 +165,6 @@ object Author {
     jsonFriends
   }
 
-  def listWorks: List[Author] = {
-
-    var g = IcebergGraph.getTitanConnection
-    val authorsGraph = g.V.has("name").toList()
-    val authorsGraph2 = g.getVertices()
-
-    //debug(authorGraph2)
-
-    //println(GremlinScalaPipeline(g.getVertices("name")))
-
-    //println(GremlinScalaPipeline(graph).V)
-    //print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toList)
-    //val pipe = new GremlinScalaPipeline[]
-
-
-    val authors = for(graphItem <- authorsGraph) yield {
-      println( "graphitem: " + graphItem.out("friends").tree )
-      //      val friends: List[Author] = for(friend <- graphItem.out("friends").has("name").toList) yield {
-      //        println("friend: " + friend.getProperty("name"))
-      //        Author(friend.getProperty("name"), friend.getPropertyKeys.toString )
-      //      }
-
-      //      for(friend <- graphItem.out("friends").has("name").toSet) {
-      //        println("friend: " + friend.getProperty("name"))
-      //        //Author(friend.getProperty("name"), friend.getPropertyKeys.toString )
-      //      }
-
-      //      if (friends != null) {
-      //        Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString, Some(friends))
-      Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString)
-      //        //Author("david", "stuff")
-      //      }
-
-
-    }
-
-    //    val authors = for(graphItem <- authorsGraph) yield {
-    //
-    //
-    //      Author(graphItem.getProperty("name"), graphItem.getPropertyKeys.toString, None )
-    //
-    //
-    //    }
-
-
-    authors
-  }
-
   val fromCreated = __.json.update((__ \ 'created).json.copyFrom( (__ \ 'created \ '$date).json.pick ))
 
   /** prunes _id
@@ -225,38 +175,25 @@ object Author {
     (__ \ 'name).json.prune andThen
       (__ \ 'email).json.prune
 
+//  implicit object authorFormat extends Format[Author] {
+//    def reads(json: JsValue) = Author(
+//      (json \ "name").as[String],
+//      (json \ "email").as[String]
+//    )
+
+  implicit val authorReads: Reads[Author] = (
+    (__ \ 'name).read[String] and
+      (__ \ 'email).read[String] and
+      (__ \ 'likes).read[Option[List[Author]]]
+    )(Author)
+
   implicit val authorWrites = new Writes[Author] {
-    def writes(author: Author) = Json.obj(
+    def writes(author: Author) = play.api.libs.json.Json.obj(
       "name" -> author.name,
-      "email.Cool" -> author.email
+      "email.Cool" -> author.email,
+      "likes" -> author.likes
     )
   }
 
-    
-  implicit val authorReads: Reads[Author] = (
-    (__ \ "name").read[String] and
-    (__ \ "email").read[String] and
-    (__ \ "likes").readNullable[List[Author]]
-  )(Author.apply _)
-
-
-
-//  implicit val authorReads: Reads[Author] = (
-//    (JsPath \ "name").read[String] and
-//    (JsPath \ "email").read[String] and
-//    (JsPath \ "likes").readNullable[List[Author]]
-//  ).(Author.apply _)
-
-//  implicit val authorReads = Json.reads[Author]
-//  implicit val authorWrites = Json.writes[Author]
-
-  //val personReads: Reads[Person] = (__ \ "name").read[String].map { name => Person(name) }
-
-//  implicit val authorWrites: Writes[Author] = (
-//    (__ \ "name").write[String] and
-//    (__ \ "email").write[String] and
-//      (__ \ "likes").writeNullable[List[Author]]
-//  )(unlift(Author.unapply))
-//
 
 }
