@@ -11,7 +11,9 @@ libraryDependencies ++= {
     "com.thinkaurelius.titan" % "titan-es" % titanV,
     "com.tinkerpop.blueprints" % "blueprints-core" % tinkerpopV,
     "com.michaelpollmeier" %% "gremlin-scala" % tinkerpopV,
-    "org.reflections" % "reflections" % "0.9.8" notTransitive ()
+    "com.github.nscala-time" %% "nscala-time" % "1.2.0",
+    "io.argonaut" %% "argonaut" % "6.0.4",
+  "org.reflections" % "reflections" % "0.9.8" notTransitive ()
   )
 }
 

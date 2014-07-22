@@ -5,6 +5,8 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
+//import argonaut._, Argonaut._
+
 case class Story(var title: String, var text: String, var tags: Option[Set[Tag]], var author: Option[Author])
 
 object Story {
@@ -21,6 +23,11 @@ object Story {
   def save(story: Story) = {
     list = list ::: List(story)
   }
+
+  // argonaut
+//  implicit def StoryEncodeJson: EncodeJson[Story] =
+//    EncodeJson((p: Story) =>
+//      ("title" := p.title) ->: ("text" := p.text) ->: ("tags" := Option[Set[p.tags]]) ->: ("author" := Some(p.author)) ->: jEmptyObject)
 
 //  def save2(story: Story): Try[List[String]] = {
 //    Try(io.Source.fromFile(filename).getLines.toList)
@@ -42,10 +49,20 @@ object Story {
     (JsPath \ "author").readNullable[Author]
   )(Story.apply _)
 
-  implicit val storyWrites: Writes[Story] = (
-    (JsPath \ "title").write[String] and
-    (JsPath \ "text").write[String] and
-    (JsPath \ "tags").writeNullable[Set[Tag]] and
-    (JsPath \ "author").writeNullable[Author]
-  )(unlift(Story.unapply))
+
+  implicit val storyWrites = new Writes[Story] {
+    def writes(story: Story) = Json.obj(
+      "title" -> story.title,
+      "email" -> story.text,
+      "tags" -> story.tags,
+      "author" -> story.author
+    )
+  }
+
+//  implicit val storyWrites: Writes[Story] = (
+//    (JsPath \ "title").write[String] and
+//    (JsPath \ "text").write[String] and
+//    (JsPath \ "tags").writeNullable[Set[Tag]] and
+//    (JsPath \ "author").writeNullable[Author]
+//  )(unlift(Story.unapply))
 }

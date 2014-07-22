@@ -18,6 +18,8 @@ import play.api.mvc.BodyParsers._
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
 
+import argonaut._, Argonaut._
+
 object IcebergGraph {
   var g: TitanGraph = null
 
@@ -48,7 +50,7 @@ object IcebergGraph {
 object Application extends Controller {
 
   object VertexTypes {
-    val Person = "human"
+    val Person = "author"
     val Media = "media"
     val Story = "story"
   }
@@ -99,7 +101,7 @@ object Application extends Controller {
     val juno = g.addVertex("person")
     juno.setProperty("class", "person")
     juno.setProperty("quote", "I like milk")
-    juno.setProperty("name", "David Vector")
+    juno.setProperty("name", "David Peterson")
     juno.setProperty("city", "bismarck")
     juno.setProperty("content", "why won't this work???")
     juno.setProperty("tags", Array("a", "b", "c", Array("ca", "cb", "cc")))
@@ -142,7 +144,7 @@ object Application extends Controller {
 
     g.commit()
 
-    val json = Json.toJson(Story.list)
+    val json =  Json.toJson(Story.list)
     Ok(json)
   }
 
